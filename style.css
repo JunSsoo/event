@@ -1,0 +1,364 @@
+:root {
+  color-scheme: only light; /* 강제 다크 모드 끄기 */
+}
+
+html,
+body {
+  margin: 0;
+  overflow-x: hidden;
+  overscroll-behavior: none; /* 위로 당겨서 새로고침(실수로 파티 초기화) 막기 */
+}
+
+body {
+  font-family: sans-serif;
+  background: #fff;
+  color: #000;
+  -webkit-tap-highlight-color: transparent;
+}
+
+section {
+  display: none;
+  min-height: 100vh;
+  min-height: 100dvh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden; /* 사진 옆 말풍선이 폰 화면 밖으로 삐져나가도 가로 스크롤 안 생기게 */
+  box-sizing: border-box;
+  /* 제스처 바·카메라 구멍 영역을 피해서 내용 배치 (안드로이드 엣지 투 엣지) */
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+}
+
+/* 탭할 것들: 빠르게 두 번 눌러도 확대되지 않게, 길게 눌러도 글자 선택 안 되게 */
+button,
+#frame,
+#go-back,
+#stickers,
+#who {
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+img {
+  -webkit-touch-callout: none; /* 길게 눌렀을 때 이미지 저장 메뉴 안 뜨게 */
+}
+
+section.active {
+  display: flex;
+}
+
+/* 질문 위에 뜨는 GIF (assets/intro.gif). 없으면 스크립트가 숨김 */
+#intro-gif {
+  width: 60%;
+  max-width: 320px;
+  margin-bottom: 20px;
+}
+
+.question {
+  font-size: 1.5rem;
+  margin: 0 0 16px;
+}
+
+button {
+  font-size: 1rem;
+  padding: 8px 20px;
+  margin: 0 6px;
+  cursor: pointer;
+}
+
+.popup {
+  position: fixed;
+  width: 160px;
+  z-index: 1;
+  transform: rotate(var(--r));
+  animation: slam 0.22s cubic-bezier(0.2, 1.5, 0.4, 1);
+}
+
+/* 화면 밖에서 크게 날아와 쾅 찍히는 느낌 */
+@keyframes slam {
+  from {
+    transform: rotate(var(--r)) scale(3.5);
+    opacity: 0;
+  }
+  to {
+    transform: rotate(var(--r)) scale(1);
+    opacity: 1;
+  }
+}
+
+/* 맞을 때 화면 흔들림 */
+#screen-check.shake {
+  animation: shake 0.35s;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translate(0, 0); }
+  15% { transform: translate(-14px, 10px); }
+  30% { transform: translate(12px, -8px); }
+  45% { transform: translate(-9px, 6px); }
+  60% { transform: translate(7px, -4px); }
+  80% { transform: translate(-3px, 2px); }
+}
+
+/* 맞을 때 붉게 번쩍 */
+#flash {
+  position: fixed;
+  inset: 0;
+  background: #e00;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 20;
+}
+
+#flash.on {
+  animation: flash 0.25s;
+}
+
+@keyframes flash {
+  0% { opacity: 0.55; }
+  100% { opacity: 0; }
+}
+
+/* 사진 뒤에 잠깐 떴다 사라지는 "쾅!" 충격 말풍선 */
+.impact {
+  position: fixed;
+  z-index: 0;
+  padding: 30px 40px;
+  font-size: 2.2rem;
+  font-weight: 900;
+  transform: translate(-50%, -50%) rotate(var(--r));
+  pointer-events: none;
+  animation: impact 0.5s ease-out forwards;
+}
+
+.impact svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.impact span {
+  position: relative;
+}
+
+@keyframes impact {
+  0% { transform: translate(-50%, -50%) rotate(var(--r)) scale(0.3); opacity: 1; }
+  25% { transform: translate(-50%, -50%) rotate(var(--r)) scale(1.3); opacity: 1; }
+  100% { transform: translate(-50%, -50%) rotate(var(--r)) scale(1.1); opacity: 0; }
+}
+
+.popup img {
+  display: block;
+  width: 100%;
+}
+
+.popup.missing {
+  height: 120px;
+  background: #ccc;
+}
+
+/* "왜 들어옴?" "누구임?" 큰 말풍선이 붙는 화면 전체 투명 층 */
+#who {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* 말풍선 하나의 자리. left/top은 스크립트에서 %로 지정 */
+.who-slot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+.who-slot .sticker {
+  position: relative;
+  padding: 44px 64px;
+  font-size: 2rem;
+}
+
+/* 화면 정가운데 큰 뭉게구름 말풍선. 구름 모양 SVG는 스크립트가 넣음 */
+#go-back {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  padding: 60px 76px;
+  font-size: 2rem;
+  font-weight: bold;
+  white-space: nowrap;
+  cursor: pointer;
+  filter: drop-shadow(3px 4px 0 rgba(0, 0, 0, 0.25));
+  animation: cloud-in 0.3s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+
+#go-back svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+#go-back span {
+  position: relative;
+}
+
+@keyframes cloud-in {
+  from { transform: translate(-50%, -50%) scale(0.2); opacity: 0; }
+  to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+h1 {
+  font-size: 1.5rem;
+  margin: 0 0 16px;
+}
+
+/* 사진 + 그 주변에 붙는 말풍선을 한 덩어리로 */
+#stage {
+  position: relative;
+  width: 80%;
+  max-width: 480px;
+  margin: 50px 0 30px;
+}
+
+#frame {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border: 1px solid #000;
+  background: #ccc;
+  cursor: pointer;
+}
+
+#cat {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 사진보다 사방으로 70px 더 넓은 투명 판. 말풍선은 여기에 붙고 클릭은 사진으로 통과 */
+#stickers {
+  position: absolute;
+  inset: -70px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.sticker {
+  position: absolute;
+  padding: 28px 46px;
+  font-size: 1.3rem;
+  font-weight: bold;
+  white-space: nowrap;
+  transform: rotate(var(--r));
+  filter: drop-shadow(2px 3px 0 rgba(0, 0, 0, 0.3));
+  animation: slap 0.18s ease-out;
+}
+
+.sticker svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.sticker span {
+  position: relative;
+}
+
+/* 위에서 탁 붙이는 느낌 */
+@keyframes slap {
+  from {
+    transform: rotate(var(--r)) scale(1.8);
+    opacity: 0;
+  }
+  to {
+    transform: rotate(var(--r)) scale(1);
+    opacity: 1;
+  }
+}
+
+#counter {
+  margin: 4px 0 12px;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+#letter {
+  width: 90%;
+  max-width: 500px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-sizing: border-box;
+  border: 1px solid #000;
+  text-align: left;
+  line-height: 1.7;
+}
+
+#confetti {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* ---------- 폰 (600px 이하) ---------- */
+@media (max-width: 600px) {
+  .question,
+  h1 {
+    font-size: 1.3rem;
+  }
+
+  /* 손가락으로 누르기 편하게 버튼 키움 */
+  button {
+    font-size: 1.05rem;
+    padding: 12px 28px;
+  }
+
+  #stage {
+    width: 85%;
+    margin: 40px 0 24px;
+  }
+
+  /* 말풍선이 화면 폭을 넘지 않게 작게, 사진 밖으로 나가는 범위도 줄임 */
+  #stickers {
+    inset: -40px;
+  }
+
+  .sticker {
+    padding: 18px 30px;
+    font-size: 1rem;
+  }
+
+  .who-slot .sticker {
+    padding: 28px 40px;
+    font-size: 1.4rem;
+  }
+
+  .popup {
+    width: 130px;
+  }
+
+  .popup.missing {
+    height: 100px;
+  }
+
+  #go-back {
+    padding: 44px 50px;
+    font-size: 1.4rem;
+  }
+
+  #letter {
+    padding: 16px;
+    font-size: 0.95rem;
+  }
+}

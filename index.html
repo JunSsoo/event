@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <!-- 삼성 인터넷 / 안드로이드 Chrome이 강제 다크 모드로 색을 뒤집지 않게 -->
+  <meta name="color-scheme" content="only light">
+  <meta name="theme-color" content="#ffffff">
+  <title>생일 축하해</title>
+  <!-- 카카오톡 등에 링크 보낼 때 미리보기 -->
+  <meta property="og:title" content="생일 축하해">
+  <meta property="og:description" content="기주현만 열어볼 것">
+  <meta property="og:image" content="https://junssoo.github.io/event/assets/cats/cat1.jpg">
+  <meta property="og:url" content="https://junssoo.github.io/event/">
+  <link rel="stylesheet" href="style.css?v=12">
+</head>
+<body>
+  <section id="screen-check" class="active">
+    <img id="intro-gif" alt="" hidden>
+    <p class="question">기주현이 맞습니까?</p>
+    <div id="buttons">
+      <button id="btn-yes">예</button>
+      <button id="btn-no">아니오</button>
+    </div>
+    <div id="who" hidden></div>
+    <div id="go-back" hidden><span>돌아갈래요 ㅠㅠ</span></div>
+  </section>
+
+  <section id="screen-cats">
+    <h1>기주현 많이 사랑해</h1>
+    <div id="stage">
+      <div id="frame">
+        <img id="cat" alt="고양이 사진">
+      </div>
+      <div id="stickers"></div>
+    </div>
+    <p id="counter"></p>
+    <button id="btn-letter" hidden>편지 읽기</button>
+  </section>
+
+  <section id="screen-letter">
+    <div id="letter">
+      <p>주현아, 내가 많이 사랑행.</p>
+      <p>올 한 해도 고생 많았고, 앞으로도 지금처럼 잘 지냈으면 좋겠어.</p>
+      <p>사진들 보면서 잠깐이라도 웃었으면 성공ㅋ</p>
+      <p>우리 앞으로도 해야할 것, 가야할 곳 많은거 알지?</p>
+      <p>너랑 꼭 함께 했으면 좋겠어.</p>
+      <p>스트레스 많이 받는 요즘이지만, 어려웠던 만큼 값질거라 생각하며 잘 헤쳐 나가길 바랄게</p>
+      <p>늘 현명하길 바라!</p>
+      <p>다시 한번 사랑해!</p>
+    </div>
+    <button id="btn-back">사진 다시 보기</button>
+  </section>
+
+  <canvas id="confetti"></canvas>
+  <div id="flash"></div>
+
+  <script src="script.js?v=19"></script>
+</body>
+</html>
